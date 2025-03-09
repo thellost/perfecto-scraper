@@ -1,29 +1,26 @@
 // import puppeteer from 'puppeteer';
-import puppeteer from 'puppeteer-core';
+import puppeteer from 'puppeteer';
 import express from 'express';
 import cors from 'cors';
 const app = express();
 const PORT = process.env.PORT || 4000;
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true}))
 app.use(cors());
 app.post('/scrape', async (req, res) => {
-  const { url } = req.body;
-  if (!url) {
-    return res.status(400).send({ error: 'URL is required' });
-  }
+  const  {url}  = req.body;
+  console.log(url)
   try {
     // const browser = await puppeteer.launch({ headless: true });
     const browser = await puppeteer.launch({
-      executablePath:
-        '/opt/render/.cache/puppeteer/chrome/linux-126.0.6478.126/chrome-linux64/chrome', // Correct path to Chrome
       headless: true,
       args: ['--no-sandbox', '--disable-setuid-sandbox'],
     });
 
     const page = await browser.newPage();
     await page.goto(url, {
-      timeout: 90000,
+      timeout: 10000,
     });
 
     function toCamelCase(str) {
@@ -354,6 +351,7 @@ app.post('/scrape', async (req, res) => {
     };
 
     res.json(listing);
+    
   } catch (error) {
     console.error('Error scraping the page:', error);
     res.status(500).send({ error: 'Failed to scrape the page' });
